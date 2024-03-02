@@ -1,6 +1,6 @@
 import pandas as pd
 
-datos = pd.read_excel(r"C:\Users\dapen\OneDrive - Universidad de los andes\MIAD\Visualización y Storytelling\Proyecto\Datos.xlsx",
+datos = pd.read_excel(r"C:\Users\dapen\OneDrive - Universidad de los andes\MIAD\Visualización y Storytelling\MIAD-visualizacion\Datos.xlsx",
                       sheet_name='Export')
 
 ## Transformación de datos
