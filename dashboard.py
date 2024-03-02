@@ -34,16 +34,16 @@ filtered_df = df[(df['año_produccion'] == año_select) &
 
 # Contenido
 
+col1, col2 = st.columns(2)
 
 # Mostrar el dataframe filtrado o realizar otras operaciones con él
 st.write(filtered_df[["Edad_producto"]].describe())
 
-## Gráfico de lineas
-fig = px.box(filtered_df, x='mes_encuesta', y='Edad_producto', title='Relación entre Fecha de Encuesta y Edad del Producto')
-
-# Añadir títulos a los ejes (opcional)
-fig.update_layout(xaxis_title='Mes', yaxis_title='Edad del Producto')
-fig.update_xaxes(range=[0, 12], dtick=1)
+with col1:
+    # Gráfico de lineas
+    fig = px.box(filtered_df, x='mes_encuesta', y='Edad_producto', title='Relación entre Fecha de Encuesta y Edad del Producto')
+    fig.update_layout(xaxis_title='Mes', yaxis_title='Edad del Producto')
+    fig.update_xaxes(range=[0, 12], dtick=1)
 
 # Mostrar el gráfico en Streamlit
 st.plotly_chart(fig)
