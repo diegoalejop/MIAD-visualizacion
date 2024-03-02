@@ -1,1 +1,2 @@
-# MIAD-visualizacion
+# Proyecto-visualizacion
+ 
