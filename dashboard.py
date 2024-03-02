@@ -9,7 +9,8 @@ st.title("Dasboard Frescura en el Mercado")
 
 # Muestra un mensaje
 st.write("Datos del mercado de Abril 2021 - Diciembre 2023")
-#------------------------------------------------------------------------------------------
+
+
 # Sidebar
 año_unico = df["año_produccion"].unique()
 marca_unico = df["Marca"].unique()
@@ -25,12 +26,12 @@ año_select = st.sidebar.selectbox('Selecciona un año de producción:', año_un
 marca_select = st.sidebar.selectbox('Selecciona una marca:', marca_unico)
 canal_select = st.sidebar.multiselect('Selecciona uno o más canales:', canal_unico)
 
-# ----------------------------------------------------------------------------------------
 # Filtra el dataframe basado en las selecciones
 filtered_df = df[(df['año_produccion'] == año_select) & 
                  (df['Marca'].isin([marca_select])) & 
                  (df['Canal'].isin(canal_select))]
-#------------------------------------------------------------------------------------------
+
+
 # Contenido
 
 
