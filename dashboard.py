@@ -35,11 +35,11 @@ if not canal_select or ciudad_select:  # Si no se seleccionó ningún canal o ci
 else:
     filtered_df = df[(df['año_produccion'] == año_select) & 
                      (df['Marca'].isin([marca_select])) & 
-                     (df['Canal'].isin(canal_select))]
+                     (df['Canal'].isin(canal_select)) & 
+                     (df['Ciudad'].isin(canal_select))]
+    
 
 # Contenido
-
-
 # Mostrar el dataframe filtrado o realizar otras operaciones con él
 df_describe = filtered_df[['Edad_producto']].describe().round(1)
 
