@@ -2,7 +2,8 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import plotly.express as px
-from ETL import df
+from modules.ETL import df
+
 
 # Título del dashboard
 st.title('Dasboard Frescura en el Mercado')
