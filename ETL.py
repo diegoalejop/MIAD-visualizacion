@@ -3,7 +3,7 @@ import pandas as pd
 # datos = pd.read_excel(r"C:\Users\dapen\OneDrive - Universidad de los andes\MIAD\Visualización y Storytelling\MIAD-visualizacion\Datos.xlsx",
                       # sheet_name='Export')
                       
-datos = pd.read_excel(r"D:\Maestria_Andes_2023\Ciclo_3\Visualización y storytelling\6.Semana\MIAD-visualizacion\Datos.xlsx",
+datos = pd.read_excel(r"C:\Users\dapen\OneDrive - Universidad de los andes\MIAD\Visualización y Storytelling\MIAD-visualizacion\Datos.xlsx",
                       sheet_name='Export')
 
 ## Transformación de datos
@@ -50,5 +50,16 @@ def calculo_frescura(row):
 
 # Aplicar la función para crear la nueva columna
 datos['Frescura'] = datos.apply(calculo_frescura, axis=1)
+
+# Crear columnas con límite "Debe Mejorar" e "Inaceptable" para cada Marca
+
+datos['Lim_debe_mejorar'] = pd.NA
+datos['Lim_inaceptable'] = pd.NA
+
+datos.loc[datos['Marca'].isin(['Marca_1', 'Marca_2', 'Marca_3']), 'Lim_debe_mejorar'] = 90
+datos.loc[datos['Marca'].isin(['Marca_1', 'Marca_2', 'Marca_3']), 'Lim_inaceptable'] = 120
+
+datos.loc[datos['Marca'].isin(['Marca_4', 'Marca_5', 'Marca_6', 'Marca_7']), 'Lim_debe_mejorar'] = 60
+datos.loc[datos['Marca'].isin(['Marca_4', 'Marca_5', 'Marca_6', 'Marca_7']), 'Lim_inaceptable'] = 100
 
 df = datos

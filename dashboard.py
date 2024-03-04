@@ -5,41 +5,43 @@ import plotly.express as px
 from ETL import df
 
 # Título del dashboard
-st.title("Dasboard Frescura en el Mercado")
+st.title('Dasboard Frescura en el Mercado')
 
 # Muestra un mensaje
-st.write("Datos del mercado de Abril 2021 - Diciembre 2023")
+st.write('Datos del mercado de Abril 2021 - Diciembre 2023')
 
 
 # Sidebar
-ciudad_unico = df["Ciudad"].unique()
-año_unico = df["año_produccion"].unique()
-marca_unico = df["Marca"].unique()
-canal_unico = df["Canal"].unique()
+ciudad_unico = df['Ciudad'].unique()
+año_unico = df['año_produccion'].unique()
+marca_unico = df['Marca'].unique()
+canal_unico = df['Canal'].unique()
 
 ## Ordena las opciones si es necesario
-ciudad_select = st.sidebar.multiselect('Selecciona una o más ciudades:', ciudad_unico)
 ciudad_unico.sort()
 año_unico.sort()
 marca_unico.sort()
 canal_unico.sort()
 
 ## objeto sidebar
+ciudad_select = st.sidebar.multiselect('Selecciona una o más ciudades:', ciudad_unico)
 año_select = st.sidebar.selectbox('Selecciona un año de producción:', año_unico)
 marca_select = st.sidebar.selectbox('Selecciona una marca:', marca_unico)
 canal_select = st.sidebar.multiselect('Selecciona uno o más canales:', canal_unico)
 
-# Filtra el dataframe basado en las selecciones
-filtered_df = df[(df['Ciudad'].isin(ciudad_select)) &
-                 (df['año_produccion'] == año_select) & 
-                 (df['Marca'].isin([marca_select])) & 
-                 (df['Canal'].isin(canal_select))]
-
+if not canal_select or ciudad_select:  # Si no se seleccionó ningún canal o ciudad, mostrar datos para todos los canales y ciudades
+    filtered_df = df[(df['año_produccion'] == año_select) & 
+                     (df['Marca'].isin([marca_select]))]
+else:
+    filtered_df = df[(df['año_produccion'] == año_select) & 
+                     (df['Marca'].isin([marca_select])) & 
+                     (df['Canal'].isin(canal_select))]
 
 # Contenido
 
+
 # Mostrar el dataframe filtrado o realizar otras operaciones con él
-df_describe = filtered_df[["Edad_producto"]].describe().round(1)
+df_describe = filtered_df[['Edad_producto']].describe().round(1)
 
 # Filtrar el dataframe para frescura 'Inaceptable'
 df_inaceptable = filtered_df[filtered_df['Frescura'] == 'Inaceptable']
@@ -55,20 +57,48 @@ df_describe_pivoted = df_describe.T
 st.write(df_describe_pivoted)
 
 # División para grafico de linea y pie
-# Gráfico de lineas
-fig_line = px.box(filtered_df, x='mes_encuesta', y='Edad_producto', title='Relación entre Fecha de Encuesta y Edad del Producto')
-fig_line.update_layout(xaxis_title='Mes', yaxis_title='Edad del Producto')
-fig_line.update_xaxes(range=[0.5, 12.5], dtick=1)
-st.plotly_chart(fig_line)
+
+# Gráfico de cajas
+# --------------------------------------------------------
+fig_box = px.box(filtered_df, x='mes_encuesta', y='Edad_producto', title='Tendencia de la Edad del Producto')
+fig_box.update_layout(xaxis_title='Mes', yaxis_title='Edad del Producto')
+fig_box.update_xaxes(range=[0.5, 12.5], dtick=1)
+st.plotly_chart(fig_box)
+
+# Gráfico de caja por empaque
+# --------------------------------------------------------
+fig_box = px.box(filtered_df, 
+                 x='mes_encuesta', 
+                 y='Edad_producto',
+                 color= 'Empaque',
+                 title='Relación entre Empaque y Edad del Producto')
+fig_box.update_layout(xaxis_title='Mes', yaxis_title='Edad del Producto')
+fig_box.update_xaxes(range=[0.5, 12.5], dtick=1)
+st.plotly_chart(fig_box)
+
+# Gráfico de linea por ciudad
+# --------------------------------------------------------
+df_grp_ret = filtered_df.groupby(['mes_encuesta', 'Ciudad'])['Edad_producto'].mean().reset_index()
+fig_line_ret = px.line(df_grp_ret, x='mes_encuesta', y='Edad_producto', color='Ciudad', 
+              title='Promedio Mensual de Frescura por Ciudad',
+              labels={'Mes': 'Mes', 'Frescura': 'Frescura'})
+fig_line_ret.update_xaxes(range=[0.5, 12.5], dtick=1)
+st.plotly_chart(fig_line_ret)
+
+# Gráfico de linea por retornabilidad
+# --------------------------------------------------------
+df_grp_ret = filtered_df.groupby(['mes_encuesta', 'Retornable'])['Edad_producto'].mean().reset_index()
+fig_line_ret = px.line(df_grp_ret, x='mes_encuesta', y='Edad_producto', color='Retornable', 
+              title='Promedio Mensual de Frescura por Retornabilidad',
+              labels={'Mes': 'Mes', 'Frescura': 'Frescura'})
+fig_line_ret.update_xaxes(range=[0.5, 12.5], dtick=1)
+st.plotly_chart(fig_line_ret)
 
 
+# División en columnas
+# --------------------------------------------------------
 col1, col2 = st.columns(2)
 
-# with col1: 
-    # st.write("Grafico cualquiera")
-    # st.write(df) 
-
-    
 with col1:
     # Gráfico de pie
     conteo_frescura = filtered_df['Frescura'].value_counts()
