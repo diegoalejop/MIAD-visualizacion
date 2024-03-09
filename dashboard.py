@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import plotly.express as px
-# from modules.ETL import df
 
 datos = pd.read_excel("Datos.xlsx", sheet_name='Export')
 
@@ -100,6 +99,7 @@ else:
     
 
 # Contenido
+# --------------------------------------------------------
 # Mostrar el dataframe filtrado o realizar otras operaciones con él
 df_describe = filtered_df[['Edad_producto']].describe().round(1)
 
@@ -114,6 +114,13 @@ df_conteo_canales = conteo_canales.reset_index()
 df_conteo_canales.columns = ['Canal', 'Cantidad']
 
 df_describe_pivoted = df_describe.T
+
+# Descripción del dasboard
+st.info(
+    "Este dashboard esta diseñado para ofrecer un visión clara y detallada "
+    "de la frescura de nuestros productos a lo largo del tiempo, en diferentes "
+    "ciudades, canales y tipos de empaque. ")
+
 st.write(df_describe_pivoted)
 
 # División para grafico de linea y pie
@@ -124,6 +131,9 @@ fig_box = px.box(filtered_df, x='mes_encuesta', y='Edad_producto', title='Tenden
 fig_box.update_layout(xaxis_title='Mes', yaxis_title='Edad del Producto')
 fig_box.update_xaxes(range=[0.5, 12.5], dtick=1)
 st.plotly_chart(fig_box)
+
+st.warning("¡ Menores valores de frescura" 
+           "significan una mejor calidad del producto al consumidor !")
 
 # Gráfico de caja por empaque
 # --------------------------------------------------------
@@ -183,6 +193,17 @@ with col2:
     )
     fig_bar.update_layout(width=350, height=350)
     st.plotly_chart(fig_bar)
+    
+# Gráfico funnel por frescura / canal
+df_frescura_canal = datos.groupby(['Frescura', 'Canal']).size().reset_index(name= 'Cantidad')
+fig_funnel = px.funnel(df_frescura_canal, 
+                       x = 'Cantidad', 
+                       y = 'Canal', 
+                       color = 'Frescura',
+                       title = 'Distribución de Frescura por Canal')
+st.plotly_chart(fig_funnel)
+
+
 
 
 
