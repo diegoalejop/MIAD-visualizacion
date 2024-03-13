@@ -4,6 +4,7 @@ import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
 import streamlit as st
+import time
 
 # Inyectar CSS para cambiar el color de fondo utilizando st.markdown
 st.markdown("""
@@ -96,13 +97,52 @@ datos.loc[datos['Marca'].isin(['Marca_4', 'Marca_5', 'Marca_6', 'Marca_7']), 'Li
 
 df = datos
 
-# Título del dashboard
-st.title('Dasboard Frescura en el Mercado')
+####Hoja de descripción
 
-# Muestra un mensaje
+# Título del dashboard
+st.title('¿Qué tan blue[fresco] es lo que yellow[consumes]?')
+
+# Fecha de datos
 st.write('Datos del mercado de Abril 2021 - Diciembre 2023')
 
+#Descripción del dashboard
+st.write("La medida de frescura de las bebidas distribuidas al por mayor" 
+         "es clave para evaluar la calidad de los productos en el mercado,"
+          "su popularidad y su futura producción. Diferentes condiciones y situaciones influyen esta medida,"
+           "por lo que conocerlas puede ser beneficioso para tu siguiente compra.")
 
+#Descripción de frescura
+st.header('¿Cómo se mide la blue[frescura]?')
+st.write("La frescura se evalúa a través del tiempo en días que lleva el producto en el mercado desde su "
+         "producción. Productos que lleven mucho tiempo en las repisas se consideran menos frescos, por lo "
+         "que suelen tener una calidad más baja. Algunos llegan a tener calidades inaceptables al llevar mucho "
+         "tiempo sin ser consumidos.")
+
+
+desc_Edad1 = """
+    La cantidad de días que lleva el producto en el mercado también se puede interpretar como la edad del producto. 
+    Esta misma edad, puede clasificarse en tres categorías que determinan si la frescura es idónea:
+"""
+
+desc_Edad2 = """
+    Como consumidor una edad elevada de producto, es equivalente a una frescura baja y por ende una calidad subóptima.
+"""
+
+def stream_data():
+    for word in desc_Edad1.split(" "):
+        yield word + " "
+        time.sleep(0.02)
+
+    yield pd.DataFrame(datos['Frescura'].drop_duplicates())
+
+    for word in desc_Edad2.split(" "):
+        yield word + " "
+        time.sleep(0.02)
+
+if st.button("Edad de producto"):
+    st.write_stream(stream_data)
+
+#########
 # Sidebar
 ciudad_unico = df['Ciudad'].unique()
 año_unico = df['año_produccion'].unique()
