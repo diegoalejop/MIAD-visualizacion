@@ -100,7 +100,7 @@ df = datos
 ####Hoja de descripción
 
 # Título del dashboard
-st.title('¿Qué tan blue[fresco] es lo que yellow[consumes]?')
+st.title('¿Qué tan fresco es lo que consumes?')
 
 # Fecha de datos
 st.write('Datos del mercado de Abril 2021 - Diciembre 2023')
@@ -112,7 +112,7 @@ st.write("La medida de frescura de las bebidas distribuidas al por mayor"
            "por lo que conocerlas puede ser beneficioso para tu siguiente compra.")
 
 #Descripción de frescura
-st.header('¿Cómo se mide la blue[frescura]?')
+st.header('¿Cómo se mide la frescura?')
 st.write("La frescura se evalúa a través del tiempo en días que lleva el producto en el mercado desde su "
          "producción. Productos que lleven mucho tiempo en las repisas se consideran menos frescos, por lo "
          "que suelen tener una calidad más baja. Algunos llegan a tener calidades inaceptables al llevar mucho "
