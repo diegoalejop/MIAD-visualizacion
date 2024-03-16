@@ -97,53 +97,13 @@ datos.loc[datos['Marca'].isin(['Marca_4', 'Marca_5', 'Marca_6', 'Marca_7']), 'Li
 
 df = datos
 
-####Hoja de descripción
 
-# Título del dashboard
-st.title('¿Qué tan fresco es lo que consumes?')
-
-# Fecha de datos
-st.write('Datos del mercado de Abril 2021 - Diciembre 2023')
-
-#Descripción del dashboard
-st.write("La medida de frescura de las bebidas distribuidas al por mayor" 
-         "es clave para evaluar la calidad de los productos en el mercado,"
-          "su popularidad y su futura producción. Diferentes condiciones y situaciones influyen esta medida,"
-           "por lo que conocerlas puede ser beneficioso para tu siguiente compra.")
-
-#Descripción de frescura
-st.header('¿Cómo se mide la frescura?')
-st.write("La frescura se evalúa a través del tiempo en días que lleva el producto en el mercado desde su "
-         "producción. Productos que lleven mucho tiempo en las repisas se consideran menos frescos, por lo "
-         "que suelen tener una calidad más baja. Algunos llegan a tener calidades inaceptables al llevar mucho "
-         "tiempo sin ser consumidos.")
-
-
-desc_Edad1 = """
-    La cantidad de días que lleva el producto en el mercado también se puede interpretar como la edad del producto. 
-    Esta misma edad, puede clasificarse en tres categorías que determinan si la frescura es idónea:
-"""
-
-desc_Edad2 = """
-    Como consumidor una edad elevada de producto, es equivalente a una frescura baja y por ende una calidad subóptima.
-"""
-
-def stream_data():
-    for word in desc_Edad1.split(" "):
-        yield word + " "
-        time.sleep(0.02)
-
-    yield pd.DataFrame(datos['Frescura'].drop_duplicates())
-
-    for word in desc_Edad2.split(" "):
-        yield word + " "
-        time.sleep(0.02)
-
-if st.button("Edad de producto"):
-    st.write_stream(stream_data)
 
 #########
 # Sidebar
+st.sidebar.title('Filtros del reporte')
+st.sidebar.header("Filtra el reporte de acuerdo con tu selección:")
+
 ciudad_unico = df['Ciudad'].unique()
 año_unico = df['año_produccion'].unique()
 marca_unico = df['Marca'].unique()
@@ -157,7 +117,7 @@ canal_unico.sort()
 
 ## objeto sidebar
 ciudad_select = st.sidebar.multiselect('Selecciona una o más ciudades:', ciudad_unico)
-año_select = st.sidebar.selectbox('Selecciona un año de producción:', año_unico)
+año_select = st.sidebar.selectbox('Selecciona años de producción:', año_unico)
 marca_select = st.sidebar.selectbox('Selecciona una marca:', marca_unico)
 canal_select = st.sidebar.multiselect('Selecciona uno o más canales:', canal_unico)
 
@@ -170,242 +130,351 @@ else:
                      (df['Canal'].isin(canal_select)) & 
                      (df['Ciudad'].isin(canal_select))]
     
+#Créditos
+st.sidebar.write('Realizado por los cuenteros de la MIAD (c)')
+# Fecha de datos   
+st.sidebar.write('Datos del mercado de Abril 2021 - Diciembre 2023')
+
 
 # Contenido
 # --------------------------------------------------------
-# Mostrar el dataframe filtrado o realizar otras operaciones con él
-df_describe = filtered_df[['Edad_producto']].describe().round(1)
-
-# Filtrar el dataframe para frescura 'Inaceptable'
-df_inaceptable = filtered_df[filtered_df['Frescura'] == 'Inaceptable']
-
-# Contar la frecuencia de cada canal y obtener los top 10
-conteo_canales = df_inaceptable['Canal'].value_counts().head(10)
-
-# Convertir la serie de conteo_canales en un dataframe para Plotly
-df_conteo_canales = conteo_canales.reset_index()
-df_conteo_canales.columns = ['Canal', 'Cantidad']
-
-df_describe_pivoted = df_describe.T
-
-# Descripción del dasboard
-st.info(
-    "Este dashboard esta diseñado para ofrecer un visión clara y detallada "
-    "de la frescura de nuestros productos a lo largo del tiempo, en diferentes "
-    "ciudades, canales y tipos de empaque. ")
-
-st.write(df_describe_pivoted)
-
-# División para grafico de linea y pie
-
-# Gráfico de cajas
-# --------------------------------------------------------
-fig_box = px.box(filtered_df, x='mes_encuesta', y='Edad_producto', title='Tendencia de la Edad del Producto')
-fig_box.update_layout(xaxis_title='Mes', yaxis_title='Edad del Producto')
-fig_box.update_xaxes(range=[0.5, 12.5], dtick=1)
-# Actualiza el color de las cajas
-fig_box.update_traces(marker_color='#E2E062', line_color='#73AC61')
-
-fig_box.update_layout(
-    title=dict(
-        text='Tendencia de la Edad del Producto',
-        font=dict(
-            family="Roboto",  # Aplica la fuente Roboto
-            size=20,  # Tamaño de la fuente
-            color='black'  # Color de la fuente
-        )
-    ),
-)
-
-st.plotly_chart(fig_box)
-
-st.info(
-    "Descripción grafico por Edad Producto. ")
-
-st.warning("¡ Menores valores de frescura" 
-           "significan una mejor calidad del producto al consumidor !")
-
-# Gráfico de caja por empaque
-# --------------------------------------------------------
-color_discrete_map_2 = {'Lata': '#E2E062', 'Botella': '#73AC61'}
-
-fig_box = px.box(filtered_df, 
-                 x='mes_encuesta', 
-                 y='Edad_producto',
-                 color= 'Empaque',
-                 title='Relación entre Empaque y Edad del Producto',
-                 color_discrete_map=color_discrete_map_2)
-                 
-fig_box.update_layout(xaxis_title='Mes', yaxis_title='Edad del Producto')
-fig_box.update_xaxes(range=[0.5, 12.5], dtick=1)
-
-fig_box.update_layout(
-    title=dict(text='Relación entre Empaque y Edad del Producto',
-               font=dict(family="Roboto", size=20, color='black'))
-    # xaxis_title='Mes',
-    # xaxis=dict(title_font=dict(family="Roboto", size=18, color='black')),
-    # yaxis_title='Edad del Producto',
-    # yaxis=dict(title_font=dict(family="Roboto", size=18, color='black')),
-    # xaxis=dict(range=[0.5, 12.5], dtick=1)
-)
-st.plotly_chart(fig_box)
-
-st.info(
-    "Descripción grafico por Empaque. ")
-
-# Gráfico de linea por ciudad
-# --------------------------------------------------------
-df_grp_ret = filtered_df.groupby(['mes_encuesta', 'Ciudad'])['Edad_producto'].mean().reset_index()
-colors = ['#636EFA', '#00CC96', '#AB63FA', '#FFA15A', '#19D3F3', '#FF6692', '#B6E880', '#FF97FF', '#FECB52']
-fig_line_ret = px.line(df_grp_ret, x='mes_encuesta', y='Edad_producto', color='Ciudad', 
-              title='Promedio Mensual de Frescura por Ciudad',
-              labels={'Mes': 'Mes', 'Frescura': 'Frescura'},
-              color_discrete_sequence=colors)
-
-fig_line_ret.update_xaxes(range=[0.5, 12.5], dtick=1)
-
-# Aplicar Roboto al título y centrarlo, ajustando también el tamaño y color de la fuente
-fig_line_ret.update_layout(
-    title=dict(text='Promedio Mensual de Frescura por Ciudad',
-               font=dict(family="Roboto", size=20, color="black")), 
-    xaxis=dict(title='Mes', title_font=dict(family="Roboto", size=18, color="black"), range=[0.5, 12.5], dtick=1),
-    yaxis=dict(title='Frescura', title_font=dict(family="Roboto", size=18, color="black"))
-)
-st.plotly_chart(fig_line_ret)
-
-st.info(
-    "Descripción grafico por Ciudad. ")
-
-# Gráfico de linea por retornabilidad
-# --------------------------------------------------------
-
-
-# df_grp_ret = filtered_df.groupby(['mes_encuesta', 'Retornable'])['Edad_producto'].mean().reset_index()
-
-# Definiendo el mapa de colores para las categorías 'Sí' y 'No'
-# color_discrete_map_2 = {'Sí': '#E2E062', 'No': '#297159'}  # Reemplaza estos colores con los que desees
-
-# fig_line_ret = px.line(df_grp_ret, x='mes_encuesta', y='Edad_producto', color='Retornable', 
-              # title='Promedio Mensual de Frescura por Retornabilidad',
-              # labels={'mes_encuesta': 'Mes', 'Edad_producto': 'Frescura'},
-              # color_discrete_map=color_discrete_map_2)
-              
-# fig_line_ret.update_xaxes(range=[0.5, 12.5], dtick=1)
-# st.plotly_chart(fig_line_ret)
-
-
-
-df_grp_ret = filtered_df.groupby(['mes_encuesta', 'Retornable'])['Edad_producto'].mean().reset_index()
-
-# Inicializa una figura
-fig_line_ret = go.Figure()
-
-# Colores específicos para cada categoría
-color_map = {'SI': '#E2E062', 'No': '#297159'}
-
-# Agrega las líneas manualmente
-for retornable, group in df_grp_ret.groupby('Retornable'):
-    fig_line_ret.add_trace(go.Scatter(x=group['mes_encuesta'], y=group['Edad_producto'],
-                                      name=retornable,
-                                      mode='lines',
-                                      line=dict(color=color_map[retornable])))
-
-# Configura el título y las etiquetas de los ejes
-fig_line_ret.update_layout(title='Promedio Mensual de Frescura por Retornabilidad',
-                           xaxis_title='Mes',
-                           yaxis_title='Frescura',
-                           xaxis=dict(range=[0.5, 12.5], dtick=1))
-
-# Configura el título y las etiquetas de los ejes con la fuente Roboto y centra el título
-fig_line_ret.update_layout(
-    title=dict(text='Promedio Mensual de Frescura por Retornabilidad',
-               font=dict(family="Roboto", size=20, color="black"))
-    # xaxis_title='Mes',
-    # xaxis=dict(title_font=dict(family="Roboto", size=18, color="black"), range=[0.5, 12.5], dtick=1),
-    # yaxis_title='Frescura',
-    # yaxis=dict(title_font=dict(family="Roboto", size=18, color="black"))
-)                           
-
-# Muestra el gráfico
-st.plotly_chart(fig_line_ret)
-
-st.info(
-    "Descripción grafico por Distribución y top 10. ")
-
-# División en columnas
-# --------------------------------------------------------
-col1, col2 = st.columns(2)
-
-with col1:
-    # Gráfico de pie
-    conteo_frescura = filtered_df['Frescura'].value_counts()
-    fig_pie = px.pie(names=conteo_frescura.index, values=conteo_frescura.values, title='Distribución de Frescura')
-    # Actualiza los colores de las partes del gráfico de pie manualmente usando color_discrete_map
-    fig_pie.update_traces(marker=dict(colors=[color_discrete_map[name] for name in conteo_frescura.index]))
     
-    fig_pie.update_layout(
-    title_font=dict(family="Roboto", size=20, color="black"),
-    width=350,
-    height=350
-)
-    st.plotly_chart(fig_pie)
+####Hoja de descripción
+# Crear contenedores para los tabs
+tab1_container_descripcion = st.container()
+with tab1_container_descripcion:
+    # Título del dashboard
+    st.title('¿Qué tan :blue[fresco] es lo que consumes?')
+
+    #Descripción del dashboard
+    st.write("La medida de frescura de las bebidas distribuidas al por mayor" 
+            "es clave para evaluar la calidad de los productos en el mercado,"
+            "su popularidad y su futura producción. Diferentes condiciones y situaciones influyen esta medida,"
+            "por lo que conocerlas puede ser beneficioso para tu siguiente compra. \n"
+            "Para responder a estas preguntas, las plants productoras toman muestrs periódicas de frescura, siendo estas"
+            "nuestra fuente principal para este reporte.")
+
+    #Descripción de frescura
+    st.header('¿Cómo se mide la :blue[frescura?]', divider='blue')
+
+    st.write("La frescura se evalúa a través del tiempo en días que lleva el producto en el mercado desde su "
+            "producción. Productos que lleven mucho tiempo en las repisas se consideran menos frescos, por lo "
+            "que suelen tener una calidad más baja. Algunos llegan a tener calidades inaceptables al llevar mucho "
+            "tiempo sin ser consumidos. \n"
+            "A continuación puedes ver el resumen en días de frescura: ")
+
+    #Tarjetas de resumen
+    col1, col2, col3, col4 = st.columns(4)
+    col1.metric("Edad Promedio", str(filtered_df['Edad_producto'].describe().mean().round().astype(int)))
+    col2.metric("Edad Mínima", str(round(filtered_df['Edad_producto'].describe().min())))
+    col3.metric("Edad Máxima", str(round(filtered_df['Edad_producto'].describe().max())))
+    col4.metric("Desvicion", str(round(datos['Edad_producto'].describe().std())))
+
+    st.write('Antes de continuar revisa algunos conceptos importantes relacionados:')
+
+    #Columnas explicativas 
+    col1, col2, col3, col4 = st.columns(4)
+
+    with col1:
+        desc_Edad1 = """
+            La cantidad de días que lleva el producto en el mercado también se puede interpretar como la edad del producto. 
+            Esta misma edad, puede clasificarse en tres categorías que determinan si la frescura es idónea:
+        """
+
+        desc_Edad2 = """
+            Como consumidor una edad elevada de producto, es equivalente a una frescura baja y por ende una calidad subóptima.
+        """
+
+        def stream_data():
+            for word in desc_Edad1.split(" "):
+                yield word + " "
+                time.sleep(0.02)
+
+            yield pd.DataFrame(datos['Frescura'].drop_duplicates())
+
+            for word in desc_Edad2.split(" "):
+                yield word + " "
+                time.sleep(0.02)
+
+        if st.button("Edad de producto"):
+            st.write_stream(stream_data)
     
-    # Descripción grafico por Canal
+    with col2:
+        desc_calidad = """
+        La frescura se puede desagregar en clasificaciones de calidad de los productos: \n
+        Ideal: lleva menos de 60 dias en el mercado  \n
+        Debe mejorar: lleva entre 60 y 100 días en el mercado \n
+        Inacetable: lleva más de 120 dias en el mercado
+        """
+        def stream_data2():
+            for word in desc_calidad.split(" "):
+                yield word + " "
+                time.sleep(0.02)
+
+        if st.button("Clasificacion de calidad"):
+            st.write_stream(stream_data2)
     
-with col2:    
-    # Crear el gráfico de barras para el top 10 de canales con frescura 'Inaceptable'    
+    with col3:
+        desc_retornabilidad = """
+        Esta medida nos indica si el envase de la bebida es retornable. 
+        """
+        def stream_data3():
+            for word in desc_retornabilidad.split(" "):
+                yield word + " "
+                time.sleep(0.02)
+
+        if st.button("Retornabilidad"):
+            st.write_stream(stream_data3)
+
+    with col4:
+        desc_tamaño = """
+        Es la capacidad de los envases en los que se distribuyen las bebidas. \n
+        Por lo general se mide en Mililítros
+        """
+        def stream_data4():
+            for word in desc_tamaño.split(" "):
+                yield word + " "
+                time.sleep(0.02)
+
+        if st.button("Tamaño"):
+            st.write_stream(stream_data4)        
+
+    # Mostrar el dataframe filtrado o realizar otras operaciones con él
+    df_describe = filtered_df[['Edad_producto']].describe().round(1)
+
+    # Filtrar el dataframe para frescura 'Inaceptable'
     df_inaceptable = filtered_df[filtered_df['Frescura'] == 'Inaceptable']
+
+    # Contar la frecuencia de cada canal y obtener los top 10
     conteo_canales = df_inaceptable['Canal'].value_counts().head(10)
+
+    # Convertir la serie de conteo_canales en un dataframe para Plotly
     df_conteo_canales = conteo_canales.reset_index()
     df_conteo_canales.columns = ['Canal', 'Cantidad']
-    
-    fig_bar = px.bar(
-        df_conteo_canales,
-        x='Canal',
-        y='Cantidad',
-        labels={'Canal': 'Canal', 'Cantidad': 'Cantidad'},
-        title='Top 10 Canales con Frescura Inaceptable',
-        color_discrete_sequence=['#297159']  # Esto cambiará el color de las barras a rojo
+
+    df_describe_pivoted = df_describe.T
+
+tab2_container = st.container()
+with tab2_container:
+    # Descripción del dasboard
+    st.write(df_describe_pivoted)
+
+    # División para grafico de linea y pie
+
+    # Gráfico de cajas
+    # --------------------------------------------------------
+    fig_box = px.box(filtered_df, x='mes_encuesta', y='Edad_producto', title='Tendencia de la Edad del Producto')
+    fig_box.update_layout(xaxis_title='Mes', yaxis_title='Edad del Producto')
+    fig_box.update_xaxes(range=[0.5, 12.5], dtick=1)
+    # Actualiza el color de las cajas
+    fig_box.update_traces(marker_color='#E2E062', line_color='#73AC61')
+
+    fig_box.update_layout(
+        title=dict(
+            text='Tendencia de la Edad del Producto',
+            font=dict(
+                family="Roboto",  # Aplica la fuente Roboto
+                size=20,  # Tamaño de la fuente
+                color='black'  # Color de la fuente
+            )
+        ),
     )
-    
-    # Actualizar el gráfico para mostrar los valores en las barras
-    fig_bar.update_traces(
-    texttemplate='%{y}',  # Muestra el valor de 'y' (Cantidad) en cada barra
-    textposition='outside'  # Coloca el texto fuera de las barras para evitar solapamientos
-)
-    
-    # Aplicar Roboto al título 
-    fig_bar.update_layout(
-    title_font=dict(family="Roboto", size=18, color="black"),
-    width=350,
-    height=350
-)
-    fig_bar.update_layout(width=350, height=350)
-    st.plotly_chart(fig_bar)   
 
-# Descripción grafico por Canal
-st.info(
-    "Descripción grafico por Distribución y top 10. ")    
-    
-# Gráfico funnel por frescura / canal
-df_frescura_canal = datos.groupby(['Frescura', 'Canal']).size().reset_index(name= 'Cantidad')
-fig_funnel = px.funnel(df_frescura_canal, 
-                       x = 'Cantidad', 
-                       y = 'Canal', 
-                       color = 'Frescura',
-                       title = 'Distribución de Frescura por Canal',
-                       color_discrete_map=color_discrete_map,
-                       category_orders=category_orders)
+    st.plotly_chart(fig_box)
 
-# Actualizar la fuente del título
-fig_funnel.update_layout(title_font=dict(family="Roboto", size=20, color="black"))
-st.plotly_chart(fig_funnel)
+    st.info(
+        "Descripción grafico por Edad Producto. ")
 
-# Descripción grafico por Canal
-st.info(
-    "Descripción grafico por canal. ")
+    st.warning("¡ Menores valores de frescura" 
+            "significan una mejor calidad del producto al consumidor !")
+
+    # Gráfico de caja por empaque
+    # --------------------------------------------------------
+    color_discrete_map_2 = {'Lata': '#E2E062', 'Botella': '#73AC61'}
+
+    fig_box = px.box(filtered_df, 
+                    x='mes_encuesta', 
+                    y='Edad_producto',
+                    color= 'Empaque',
+                    title='Relación entre Empaque y Edad del Producto',
+                    color_discrete_map=color_discrete_map_2)
+                    
+    fig_box.update_layout(xaxis_title='Mes', yaxis_title='Edad del Producto')
+    fig_box.update_xaxes(range=[0.5, 12.5], dtick=1)
+
+    fig_box.update_layout(
+        title=dict(text='Relación entre Empaque y Edad del Producto',
+                font=dict(family="Roboto", size=20, color='black'))
+        # xaxis_title='Mes',
+        # xaxis=dict(title_font=dict(family="Roboto", size=18, color='black')),
+        # yaxis_title='Edad del Producto',
+        # yaxis=dict(title_font=dict(family="Roboto", size=18, color='black')),
+        # xaxis=dict(range=[0.5, 12.5], dtick=1)
+    )
+    st.plotly_chart(fig_box)
+
+    st.info(
+        "Descripción grafico por Empaque. ")
+
+    # Gráfico de linea por ciudad
+    # --------------------------------------------------------
+    df_grp_ret = filtered_df.groupby(['mes_encuesta', 'Ciudad'])['Edad_producto'].mean().reset_index()
+    colors = ['#636EFA', '#00CC96', '#AB63FA', '#FFA15A', '#19D3F3', '#FF6692', '#B6E880', '#FF97FF', '#FECB52']
+    fig_line_ret = px.line(df_grp_ret, x='mes_encuesta', y='Edad_producto', color='Ciudad', 
+                title='Promedio Mensual de Frescura por Ciudad',
+                labels={'Mes': 'Mes', 'Frescura': 'Frescura'},
+                color_discrete_sequence=colors)
+
+    fig_line_ret.update_xaxes(range=[0.5, 12.5], dtick=1)
+
+    # Aplicar Roboto al título y centrarlo, ajustando también el tamaño y color de la fuente
+    fig_line_ret.update_layout(
+        title=dict(text='Promedio Mensual de Frescura por Ciudad',
+                font=dict(family="Roboto", size=20, color="black")), 
+        xaxis=dict(title='Mes', title_font=dict(family="Roboto", size=18, color="black"), range=[0.5, 12.5], dtick=1),
+        yaxis=dict(title='Frescura', title_font=dict(family="Roboto", size=18, color="black"))
+    )
+    st.plotly_chart(fig_line_ret)
+
+    st.info(
+        "Descripción grafico por Ciudad. ")
+
+    # Gráfico de linea por retornabilidad
+    # --------------------------------------------------------
+
+
+    # df_grp_ret = filtered_df.groupby(['mes_encuesta', 'Retornable'])['Edad_producto'].mean().reset_index()
+
+    # Definiendo el mapa de colores para las categorías 'Sí' y 'No'
+    # color_discrete_map_2 = {'Sí': '#E2E062', 'No': '#297159'}  # Reemplaza estos colores con los que desees
+
+    # fig_line_ret = px.line(df_grp_ret, x='mes_encuesta', y='Edad_producto', color='Retornable', 
+                # title='Promedio Mensual de Frescura por Retornabilidad',
+                # labels={'mes_encuesta': 'Mes', 'Edad_producto': 'Frescura'},
+                # color_discrete_map=color_discrete_map_2)
+                
+    # fig_line_ret.update_xaxes(range=[0.5, 12.5], dtick=1)
+    # st.plotly_chart(fig_line_ret)
 
 
 
+    df_grp_ret = filtered_df.groupby(['mes_encuesta', 'Retornable'])['Edad_producto'].mean().reset_index()
 
-#Prueba de commit Santiago
+    # Inicializa una figura
+    fig_line_ret = go.Figure()
+
+    # Colores específicos para cada categoría
+    color_map = {'SI': '#E2E062', 'No': '#297159'}
+
+    # Agrega las líneas manualmente
+    for retornable, group in df_grp_ret.groupby('Retornable'):
+        fig_line_ret.add_trace(go.Scatter(x=group['mes_encuesta'], y=group['Edad_producto'],
+                                        name=retornable,
+                                        mode='lines',
+                                        line=dict(color=color_map[retornable])))
+
+    # Configura el título y las etiquetas de los ejes
+    fig_line_ret.update_layout(title='Promedio Mensual de Frescura por Retornabilidad',
+                            xaxis_title='Mes',
+                            yaxis_title='Frescura',
+                            xaxis=dict(range=[0.5, 12.5], dtick=1))
+
+    # Configura el título y las etiquetas de los ejes con la fuente Roboto y centra el título
+    fig_line_ret.update_layout(
+        title=dict(text='Promedio Mensual de Frescura por Retornabilidad',
+                font=dict(family="Roboto", size=20, color="black"))
+        # xaxis_title='Mes',
+        # xaxis=dict(title_font=dict(family="Roboto", size=18, color="black"), range=[0.5, 12.5], dtick=1),
+        # yaxis_title='Frescura',
+        # yaxis=dict(title_font=dict(family="Roboto", size=18, color="black"))
+    )                           
+
+    # Muestra el gráfico
+    st.plotly_chart(fig_line_ret)
+
+    st.info(
+        "Descripción grafico por Distribución y top 10. ")
+
+    # División en columnas
+    # --------------------------------------------------------
+    col1, col2 = st.columns(2)
+
+    with col1:
+        # Gráfico de pie
+        conteo_frescura = filtered_df['Frescura'].value_counts()
+        fig_pie = px.pie(names=conteo_frescura.index, values=conteo_frescura.values, title='Distribución de Frescura')
+        # Actualiza los colores de las partes del gráfico de pie manualmente usando color_discrete_map
+        fig_pie.update_traces(marker=dict(colors=[color_discrete_map[name] for name in conteo_frescura.index]))
+        
+        fig_pie.update_layout(
+        title_font=dict(family="Roboto", size=20, color="black"),
+        width=350,
+        height=350
+    )
+        st.plotly_chart(fig_pie)
+        
+        # Descripción grafico por Canal
+        
+    with col2:    
+        # Crear el gráfico de barras para el top 10 de canales con frescura 'Inaceptable'    
+        df_inaceptable = filtered_df[filtered_df['Frescura'] == 'Inaceptable']
+        conteo_canales = df_inaceptable['Canal'].value_counts().head(10)
+        df_conteo_canales = conteo_canales.reset_index()
+        df_conteo_canales.columns = ['Canal', 'Cantidad']
+        
+        fig_bar = px.bar(
+            df_conteo_canales,
+            x='Canal',
+            y='Cantidad',
+            labels={'Canal': 'Canal', 'Cantidad': 'Cantidad'},
+            title='Top 10 Canales con Frescura Inaceptable',
+            color_discrete_sequence=['#297159']  # Esto cambiará el color de las barras a rojo
+        )
+        
+        # Actualizar el gráfico para mostrar los valores en las barras
+        fig_bar.update_traces(
+        texttemplate='%{y}',  # Muestra el valor de 'y' (Cantidad) en cada barra
+        textposition='outside'  # Coloca el texto fuera de las barras para evitar solapamientos
+    )
+        
+        # Aplicar Roboto al título 
+        fig_bar.update_layout(
+        title_font=dict(family="Roboto", size=18, color="black"),
+        width=350,
+        height=350
+    )
+        fig_bar.update_layout(width=350, height=350)
+        st.plotly_chart(fig_bar)   
+
+    # Descripción grafico por Canal
+    st.info(
+        "Descripción grafico por Distribución y top 10. ")    
+        
+    # Gráfico funnel por frescura / canal
+    df_frescura_canal = datos.groupby(['Frescura', 'Canal']).size().reset_index(name= 'Cantidad')
+    fig_funnel = px.funnel(df_frescura_canal, 
+                        x = 'Cantidad', 
+                        y = 'Canal', 
+                        color = 'Frescura',
+                        title = 'Distribución de Frescura por Canal',
+                        color_discrete_map=color_discrete_map,
+                        category_orders=category_orders)
+
+    # Actualizar la fuente del título
+    fig_funnel.update_layout(title_font=dict(family="Roboto", size=20, color="black"))
+    st.plotly_chart(fig_funnel)
+
+    # Descripción grafico por Canal
+    st.info(
+        "Descripción grafico por canal. ")
+
+
+# Agregar tabs
+tabs = ["Bienvenida", "Dashboard"]
+tab_seleccionado = st.radio("Selecciona un tab:", tabs)
+
+# Mostrar el contenido del tab seleccionado
+if tab_seleccionado == "Bienvenida":
+    tab1_container_descripcion
+elif tab_seleccionado == "Dashboard":
+    tab2_container
