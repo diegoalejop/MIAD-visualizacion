@@ -3,8 +3,8 @@
 ¿Qué tan fresco es lo que consumes?
 
 Sidebar: 
-	- Cambiar segmentadior de años a selección múltiple - Diego
-	- Rnago de datos -Diego
+	- Cambiar segmentadior de años a selección múltiple - Diego (hecho)
+	- Rnago de datos -Diego 
 	- Agregar creditos -Diego
 
 Tab1 (Que es la frescura?) 
