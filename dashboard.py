@@ -5,6 +5,8 @@ import plotly.express as px
 import plotly.graph_objects as go
 import streamlit as st
 import time
+import folium
+from streamlit_folium import folium_static
 
 # Inyectar CSS para cambiar el color de fondo utilizando st.markdown
 st.markdown("""
@@ -253,6 +255,59 @@ with tab1_container_descripcion:
     df_conteo_canales.columns = ['Canal', 'Cantidad']
 
     df_describe_pivoted = df_describe.T
+
+
+    #Mapa por ciudad
+    df_ciudad = filtered_df.groupby(['Ciudad'])['Edad_producto'].describe().reset_index()[['Ciudad','mean']]
+    df_ciudad.rename(columns={'mean':'Edad'}, inplace=True)
+
+    #Colores asignados por clasificación
+    limites_clas = [
+        (df_ciudad['Edad'] < 90),
+        ((df_ciudad['Edad'] >=90) & (df_ciudad['Edad'] <=110) ),
+        (df_ciudad['Edad'] > 110)
+    ]
+
+    colores = ['#BFB445','#64954D','#0C5951']
+    df_ciudad['Color'] = np.select(limites_clas,colores)
+
+    # Función para convertir el color hexadecimal a un formato compatible con Folium
+    def hex_to_rgb(hex_color):
+        hex_color = hex_color.lstrip('#')
+        return tuple(int(hex_color[i:i+2], 16) for i in (0, 2, 4))
+
+    # Crear un mapa centrado en Colombia
+    mapa = folium.Map(location=[4.7, -76], zoom_start=7.49)
+
+    # Añadir marcadores para cada ciudad con el tamaño proporcional al valor y color personalizado
+    for index, row in df_ciudad.iterrows():
+        ciudad = row['Ciudad']
+        valor = row['Edad']
+        color_hex = row['Color']
+        color_rgb = hex_to_rgb(color_hex)
+        
+        # Determinar la ubicación de la ciudad
+        if ciudad == 'Bogotá':
+            location = [4.6097, -74.0817]
+        elif ciudad == 'Cali':
+            location = [3.4516, -76.5320]
+        elif ciudad == 'Medellín':
+            location = [6.2442, -75.5812]
+        
+        folium.CircleMarker(
+            location=location,
+            radius=valor/1.5,
+            color=color_hex,
+            fill=True,
+            fill_color=color_hex,
+            fill_opacity=0.6,
+            popup=f'{ciudad}: {valor}'
+        ).add_to(mapa)
+    
+    st.header('Frescura en las principales ciudades de Colombia')
+    #st.write('Valores representados por el tamaño de las esferas')
+    folium_static(mapa)
+
 
 tab2_container = st.container()
 with tab2_container:
