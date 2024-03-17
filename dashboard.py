@@ -179,6 +179,7 @@ st.sidebar.write('Datos del mercado de Abril 2021 - Diciembre 2023')
 ## Hoja de descripción
 # Crear contenedores para los tabs
 # Título del dashboard
+st.image('Logo.png')
 st.title('¿Qué tan :green[fresco] es lo que consumes?')
 
 #Descripción del dashboard
