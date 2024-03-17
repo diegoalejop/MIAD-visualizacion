@@ -13,10 +13,6 @@ st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap');
 
-    .stApp {
-        background-color: #F5F7F8;
-    }
-
     /* Aumentar la especificidad para los elementos de texto dentro de st.info */
     .stAlert>div>div {
         font-family: 'Open Sans', sans-serif !important;
@@ -54,6 +50,39 @@ datos['mes_produccion'] = datos['Fecha_produccion'].dt.month
 datos['año_encuesta'] = datos['Fecha_encuesta'].dt.year
 datos['mes_encuesta'] = datos['Fecha_encuesta'].dt.month
 
+# Creación de la columna mes nombre
+def convertir_mes(numero_mes):
+    if numero_mes == 1:
+        return '01.Ene'
+    elif numero_mes == 2:
+        return '02.Feb'
+    elif numero_mes == 3:
+        return '03.Mar'
+    elif numero_mes == 4:
+        return '04.Abr'
+    elif numero_mes == 5:
+        return '05.May'
+    elif numero_mes == 6:
+        return '06.Jun'
+    elif numero_mes == 7:
+        return '07.Jul'
+    elif numero_mes == 8:
+        return '08.Ago'
+    elif numero_mes == 9:
+        return '09.Sep'
+    elif numero_mes == 10:
+        return '10.Oct'
+    elif numero_mes == 11:
+        return '11.Nov'
+    elif numero_mes == 12:
+        return '12.Dic'
+    else:
+        return 'Mes inválido'
+
+# Aplicar la función a la columna 'Mes' del DataFrame
+datos['mes_nombre'] = datos['mes_encuesta'].apply(convertir_mes)
+
+
 # Eliminación de columnas innecesarias para la visualización
 datos = datos.drop(columns=['Referencia', 'Establecimiento', 'Lote', 'Vida_util_timedelta', 'Texto', 'Und_Volumen', 'Fecha_vencimiento'])
 
@@ -62,9 +91,9 @@ def calculo_canal(row):
                         'Entretenimiento',
                         'Tienda con consumo',
                         'Tienda de Barrio']:
-        return 'ON'
+        return 'On'
     else:
-        return 'OFF'
+        return 'Off'
     
 # Cálculo de la columna frescura teniendo en cuenta sus respectivas condiciones
 def calculo_frescura(row):
@@ -153,17 +182,17 @@ st.sidebar.write('Datos del mercado de Abril 2021 - Diciembre 2023')
 st.title('¿Qué tan :green[fresco] es lo que consumes?')
 
 #Descripción del dashboard
-st.write("La evaluación de la frescura para las empresas de consumo" 
-         "masivo, es fundamental para determinar la calidad de los"
+st.write("La evaluación de la frescura para las empresas de consumo " 
+         "masivo es fundamental para determinar la calidad de los "
          "productos en el mercado, su nivel de aceptación y planificar "
-         "su producción futura. Diversas condiciones y circunstancias"
+         "su producción futura. Diversas condiciones y circunstancias "
          "pueden influir en esta evaluación, por lo que comprenderlas "
-         "puede resultar beneficioso para tu próxima adquisición.")
+         "resulta beneficioso para tu próxima adquisición.")
 
-st.write("Para abordar estas cuestiones, las plantas productoras"
-         "realizan muestreos periódicos de frescura, los cuales"
-         "constituyen de nuestra principal fuente de información para"
-         "este informe..")
+st.write("Para abordar estas cuestiones, las plantas productoras "
+         "realizan muestreos periódicos de frescura, los cuales "
+         "constituyen nuestra principal fuente de información para "
+         "este informe.")
 
 #Descripción de frescura
 st.header('¿Cómo se mide la :green[frescura?]', divider='green')
@@ -172,7 +201,8 @@ st.write("La frescura se evalúa a través del tiempo en días que lleva el prod
             "producción. Productos que lleven mucho tiempo en las repisas se consideran menos frescos, por lo "
             "que suelen tener una calidad más baja. Algunos llegan a tener calidades inaceptables al llevar mucho "
             "tiempo sin ser consumidos. \n"
-            "A continuación puedes ver el resumen en días de frescura: ")
+            "A continuación puedes ver el resumen de frescura (De acuerdo "
+            " a tu selección realizada en los filtros): ")
 
     
 df_describe = filtered_df[['Edad_producto']].describe().round(1)
@@ -190,6 +220,7 @@ col3.metric("Edad Máxima", str(max))
 col4.metric("Desviación", str(std))
 
 st.header('Revisa los siguientes conceptos importantes:', divider='green')
+st.warning('Para el preciso entiendimiento del dashboard, toma tu tiempo para explorar los siguientes conceptos')
 
 col1, col2, col3, col4 = st.columns(4)
 
@@ -209,15 +240,15 @@ with col1:
         for word in desc_Edad2.split(" "):
             yield word + " "
             time.sleep(0.02)
-    if st.button("Edad de producto1"):
+    if st.button("Edad de producto"):
         st.write_stream(stream_data)
 
 with col2:   
     desc_calidad = """
         La frescura se puede desagregar en clasificaciones de calidad de los productos: \n
-        Ideal: lleva menos de 60 dias en el mercado  \n
-        Debe mejorar: lleva entre 60 y 100 días en el mercado \n
-        Inacetable: lleva más de 120 dias en el mercado
+        * **Ideal**: lleva menos de 60 dias en el mercado  \n
+        * **Debe mejorar**: lleva entre 60 y 120 días en el mercado \n
+        * **Inaceptable**: lleva más de 120 dias en el mercado
         """
     def stream_data2():
         for word in desc_calidad.split(" "):
@@ -251,10 +282,10 @@ with col3:
 with col4:
     desc_canal = """
         Los canales de venta se dividen en dos principales grupos:
-        1. On Trade: Se refiere a la venta de bebidas alcohólicas
+        1. **On Trade**: Se refiere a la venta de bebidas alcohólicas
         para ser consumidas en el mismo lugar de compra. Por ejemplo:
         bares, tiendas de barrio, restaurantes y clubes.
-        2. Off Trade: Se refiere a la venta e bebidas alcohólicas 
+        2. **Off Trade**: Se refiere a la venta e bebidas alcohólicas 
         para ser consumidas fuera del lugar de compra. 
         Este canal abarca supermercados y licorerías
         """
@@ -266,73 +297,11 @@ with col4:
     if st.button("Canal"):
         st.write_stream(stream_data4)        
 
-#Mapa por ciudad
-df_ciudad = filtered_df.groupby(['Ciudad'])['Edad_producto'].describe().reset_index()[['Ciudad','mean']]
-df_ciudad.rename(columns={'mean':'Edad'}, inplace=True)
-
-#Colores asignados por clasificación
-limites_clas = [
-    (df_ciudad['Edad'] < 90),
-    ((df_ciudad['Edad'] >=90) & (df_ciudad['Edad'] <=110) ),
-    (df_ciudad['Edad'] > 110)
-]
-
-colores = ['#BFB445','#64954D','#0C5951']
-df_ciudad['Color'] = np.select(limites_clas,colores)
-
-# Función para convertir el color hexadecimal a un formato compatible con Folium
-def hex_to_rgb(hex_color):
-    hex_color = hex_color.lstrip('#')
-    return tuple(int(hex_color[i:i+2], 16) for i in (0, 2, 4))
-
-# Crear un mapa centrado en Colombia
-mapa = folium.Map(location=[4.7, -76], zoom_start=7.49)
-
-# Añadir marcadores para cada ciudad con el tamaño proporcional al valor y color personalizado
-for index, row in df_ciudad.iterrows():
-    ciudad = row['Ciudad']
-    valor = row['Edad']
-    color_hex = row['Color']
-    color_rgb = hex_to_rgb(color_hex)
-    
-    # Determinar la ubicación de la ciudad
-    if ciudad == 'Bogotá':
-        location = [4.6097, -74.0817]
-    elif ciudad == 'Cali':
-        location = [3.4516, -76.5320]
-    elif ciudad == 'Medellín':
-        location = [6.2442, -75.5812]
-    
-    folium.CircleMarker(
-        location=location,
-        radius=valor/1.5,
-        color=color_hex,
-        fill=True,
-        fill_color=color_hex,
-        fill_opacity=0.6,
-        popup=f'{ciudad}: {valor}'
-    ).add_to(mapa)
-
-st.header('Frescura en las principales ciudades de Colombia')
-#st.write('Valores representados por el tamaño de las esferas')
-folium_static(mapa)
-
 st.header('Análisis de resultados', divider= 'green',help="Recuerda revisar las explicaciones para cada gráfico")
 
 tab1, tab2, tab3, tab4, tab5 = st.tabs(["Análisis General", "Tipo de Empaque", "Ciudad", "Retornabilidad", "Canal"], )
+
 with tab1: # Tendencia general
-    st.write("Muestra con frescura mínima")
-    # Obtención del valor mínimo    
-    indice_minimo = filtered_df['Edad_producto'].idxmin()
-    min_eproducto = filtered_df.at[indice_minimo, 'Edad_producto']
-    min_empaque = filtered_df.at[indice_minimo, 'Empaque']
-    min_canal = filtered_df.at[indice_minimo, 'Canal']
-    
-    #Tarjetas de resumen mínimo
-    col1, col2, col3 = st.columns(3)
-    col1.metric("Edad Promedio", str(min_eproducto))
-    col2.metric("Canal", str(min_canal))
-    col3.metric("Empaque", str(min_empaque))   
     
     explicacion_general = '''
     Un análisis exhaustivo de los datos revela el 
@@ -351,21 +320,53 @@ with tab1: # Tendencia general
     de la frescura y su relación con otros aspectos del mercado. 
     '''
     
-    def stream_fresc_min():
-        for word in explicacion_general.split(" "):
-            yield word + " "
-            time.sleep(0.02)
-    if st.button("Comportamiento global"):
-        st.write_stream(stream_fresc_min)
-
-    #with st.expander("📕 Ver explicación"):
-    #    st.markdown(explicacion_general)    
+    with st.expander("📕 Ver explicación"):        
+        st.markdown(explicacion_general)
     
-    datos_linea_g = filtered_df.groupby('mes_encuesta')['Edad_producto'].agg(['mean', 'std']).reset_index()
+    st.subheader("👍 ¿Cual es la muestra :green[más fresca]?")
+
+    # Obtención del valor mínimo    
+    indice_minimo = filtered_df['Edad_producto'].idxmin()
+    min_eproducto = filtered_df.at[indice_minimo, 'Edad_producto']
+    min_empaque = filtered_df.at[indice_minimo, 'Empaque']
+    min_canal = filtered_df.at[indice_minimo, 'Canal']
+    min_ciudad = filtered_df.at[indice_minimo, 'Ciudad']
+    min_marca = filtered_df.at[indice_minimo, 'Marca']
+    
+    #Tarjetas de resumen mínimo
+    col1, col2, col3, col4, col5 = st.columns(5)
+    col1.metric("Edad Promedio", str(min_eproducto))
+    col2.metric("Marca", str(min_marca))
+    col3.metric("Canal", str(min_canal))
+    col4.metric("Empaque", str(min_empaque))
+    col5.metric("Ciudad", str(min_ciudad))    
+    
+    st.subheader("👎 ¿Cual es la muestra :red[menos fresca]?")
+    
+    # Obtención del valor mínimo    
+    indice_maximo = filtered_df['Edad_producto'].idxmax()
+    max_eproducto = filtered_df.at[indice_maximo, 'Edad_producto']
+    max_empaque = filtered_df.at[indice_maximo, 'Empaque']
+    max_canal = filtered_df.at[indice_maximo, 'Canal']
+    max_ciudad = filtered_df.at[indice_maximo, 'Ciudad']
+    max_marca = filtered_df.at[indice_maximo, 'Marca']
+    
+    #Tarjetas de resumen mínimo
+    col1, col2, col3, col4, col5 = st.columns(5)
+    col1.metric("Edad Promedio", str(max_eproducto))
+    col2.metric("Marca", str(max_marca))
+    col3.metric("Canal", str(max_canal))
+    col4.metric("Empaque", str(max_empaque))
+    col5.metric("Ciudad", str(max_ciudad))
+
+    
+
+
+    datos_linea_g = filtered_df.groupby('mes_nombre')['Edad_producto'].agg(['mean', 'std']).reset_index()
     fig_line_g = go.Figure()
     # Línea de la media
     fig_line_g.add_trace(go.Scatter(
-        x=datos_linea_g['mes_encuesta'].astype(str),
+        x=datos_linea_g['mes_nombre'].astype(str),
         y=datos_linea_g['mean'],
         mode='lines+markers',
         name='Media de Frescura',
@@ -375,7 +376,7 @@ with tab1: # Tendencia general
 
     # Banda de error para la desviación estándar
     fig_line_g.add_trace(go.Scatter(
-        x=pd.concat([datos_linea_g['mes_encuesta'], datos_linea_g['mes_encuesta'][::-1]]).astype(str),
+        x=pd.concat([datos_linea_g['mes_nombre'], datos_linea_g['mes_nombre'][::-1]]).astype(str),
         y=pd.concat([datos_linea_g['mean'] + datos_linea_g['std']/20, (datos_linea_g['mean'] - datos_linea_g['std']/20)[::-1]]),
         fill='toself',
         fillcolor='rgba(0,100,80,0.2)',
@@ -394,23 +395,79 @@ with tab1: # Tendencia general
 
     st.plotly_chart(fig_line_g)
     
-    color_discrete_map = {
-    'Ideal': '#45875e',  
-    'Debe Mejorar': '#e2e062',  
-    'Inaceptable': '#FF9B9B'}
+    col1, col2 = st.columns(2)
     
-    conteo_frescura = filtered_df['Frescura'].value_counts()
-    fig_pie = px.pie(names=conteo_frescura.index, 
-                     values=conteo_frescura.values, 
-                     title='Distribución de Frescura',
-                     color_discrete_map=color_discrete_map)
-    fig_pie.update_traces(marker=dict(colors=[color_discrete_map[name] for name in conteo_frescura.index]))
-    fig_pie.update_layout(
-    title_font=dict(family="Roboto", size=20, color="black"),
-    width=350,
-    height=350
-    )
-    st.plotly_chart(fig_pie)
+    with col1: # pie    
+        color_discrete_map = {
+        'Ideal': '#45875e',  
+        'Debe Mejorar': '#e2e062',  
+        'Inaceptable': '#FF9B9B'}
+        
+        conteo_frescura = filtered_df['Frescura'].value_counts()
+        fig_pie = px.pie(names=conteo_frescura.index, 
+                        values=conteo_frescura.values, 
+                        title='Distribución de Frescura',
+                        color_discrete_map=color_discrete_map)
+        fig_pie.update_traces(marker=dict(colors=[color_discrete_map[name] for name in conteo_frescura.index]))
+        fig_pie.update_layout(
+        title_font=dict(family="Roboto", size=20, color="black"),
+        width=350,
+        height=350,
+        margin=dict(l=50, r=50, t=50, b=50)
+        )
+        st.plotly_chart(fig_pie)
+    
+    with col2: #Mapa por ciudad
+        df_ciudad = filtered_df.groupby(['Ciudad'])['Edad_producto'].describe().reset_index()[['Ciudad','mean']]
+        df_ciudad.rename(columns={'mean':'Edad'}, inplace=True)
+
+        #Colores asignados por clasificación
+        limites_clas = [
+            (df_ciudad['Edad'] < 90),
+            ((df_ciudad['Edad'] >=90) & (df_ciudad['Edad'] <=110) ),
+            (df_ciudad['Edad'] > 110)
+        ]
+
+        colores = ['#0C5951','#64954D','#BFB445']
+        df_ciudad['Color'] = np.select(limites_clas,colores)
+
+        # Función para convertir el color hexadecimal a un formato compatible con Folium
+        def hex_to_rgb(hex_color):
+            hex_color = hex_color.lstrip('#')
+            return tuple(int(hex_color[i:i+2], 16) for i in (0, 2, 4))
+
+        # Crear un mapa centrado en Colombia
+        st.markdown('<span style="font-family: Roboto; font-size: 14pt;">**Distribución por ciudad de frescura**</span>', unsafe_allow_html=True)
+        
+        mapa = folium.Map(location=[4.7, -76], zoom_start=6, width='300px', height='400px')
+        
+        # Añadir marcadores para cada ciudad con el tamaño proporcional al valor y color personalizado
+        for index, row in df_ciudad.iterrows():
+            ciudad = row['Ciudad']
+            valor = row['Edad']
+            color_hex = row['Color']
+            color_rgb = hex_to_rgb(color_hex)
+            
+            # Determinar la ubicación de la ciudad
+            if ciudad == 'Bogotá':
+                location = [4.6097, -74.0817]
+            elif ciudad == 'Cali':
+                location = [3.4516, -76.5320]
+            elif ciudad == 'Medellín':
+                location = [6.2442, -75.5812]
+            
+            folium.CircleMarker(
+                location=location,
+                radius=valor/4,
+                color=color_hex,
+                fill=True,
+                fill_color=color_hex,
+                fill_opacity=0.6,
+                popup=f'{ciudad}: {valor}'
+            ).add_to(mapa)
+        #st.header('Frescura en las principales ciudades de Colombia')
+        #st.write('Valores representados por el tamaño de las esferas')
+        folium_static(mapa)
        
 with tab2: # Tipo de empaque
     explicacion_empaque = '''
@@ -431,7 +488,7 @@ with tab2: # Tipo de empaque
     
     
     fig_line_te = go.Figure()
-    datos_linea_emp = filtered_df.groupby(['mes_encuesta', 'Empaque'])['Edad_producto'].agg(['mean', 'std']).reset_index()
+    datos_linea_emp = filtered_df.groupby(['mes_nombre', 'Empaque'])['Edad_producto'].agg(['mean', 'std']).reset_index()
 
     for empaque in datos_linea_emp['Empaque'].unique():
         df_empaque = datos_linea_emp[datos_linea_emp['Empaque'] == empaque]
@@ -444,7 +501,7 @@ with tab2: # Tipo de empaque
 
         # Línea de la media para cada empaque
         fig_line_te.add_trace(go.Scatter(
-            x=df_empaque['mes_encuesta'].astype(str),
+            x=df_empaque['mes_nombre'].astype(str),
             y=df_empaque['mean'],
             mode='lines+markers',
             name=f'{empaque}',
@@ -453,7 +510,7 @@ with tab2: # Tipo de empaque
 
         # Agregar banda de error para la desviación estándar
         fig_line_te.add_trace(go.Scatter(
-            x=pd.concat([df_empaque['mes_encuesta'], df_empaque['mes_encuesta'][::-1]]).astype(str),
+            x=pd.concat([df_empaque['mes_nombre'], df_empaque['mes_nombre'][::-1]]).astype(str),
             y=pd.concat([df_empaque['mean'] + df_empaque['std']/20, (df_empaque['mean'] - df_empaque['std']/20)[::-1]]),
             fill='toself',
             fillcolor=fillcolor_empaque, 
@@ -496,13 +553,7 @@ with tab3: # Ciudad
     de clima frío como Bogotá. Esto se debe a que los consumidores 
     en áreas cálidas tienden a preferir bebidas refrescantes y 
     sin astringencia, mientras que los consumidores en climas fríos 
-    pueden tener preferencias diferentes. 
-    
-    Por lo tanto, entender las preferencias regionales 
-    nos permite adaptar nuestras estrategias de producción, 
-    distribución y marketing de manera más precisa, 
-    maximizando así la satisfacción del cliente y 
-    la eficacia de nuestras operaciones comerciales. 
+    pueden tener preferencias diferentes.
     '''
     
     with st.expander("Ver explicación"):
@@ -510,7 +561,7 @@ with tab3: # Ciudad
     
     
     fig_line_c = go.Figure()
-    datos_linea_ciu = filtered_df.groupby(['mes_encuesta', 'Ciudad'])['Edad_producto'].agg(['mean', 'std']).reset_index()
+    datos_linea_ciu = filtered_df.groupby(['mes_nombre', 'Ciudad'])['Edad_producto'].agg(['mean', 'std']).reset_index()
 
     for ciudad in datos_linea_ciu['Ciudad'].unique():
         df_ciudad = datos_linea_ciu[datos_linea_ciu['Ciudad'] == ciudad]
@@ -524,7 +575,7 @@ with tab3: # Ciudad
 
         # Línea de la media para cada empaque
         fig_line_c.add_trace(go.Scatter(
-            x=df_ciudad['mes_encuesta'].astype(str),
+            x=df_ciudad['mes_nombre'].astype(str),
             y=df_ciudad['mean'],
             mode='lines+markers',
             name=f'{ciudad}',
@@ -533,7 +584,7 @@ with tab3: # Ciudad
 
         # Agregar banda de error para la desviación estándar
         fig_line_c.add_trace(go.Scatter(
-            x=pd.concat([df_ciudad['mes_encuesta'], df_ciudad['mes_encuesta'][::-1]]).astype(str),
+            x=pd.concat([df_ciudad['mes_nombre'], df_ciudad['mes_nombre'][::-1]]).astype(str),
             y=pd.concat([df_ciudad['mean'] + df_ciudad['std']/10, (df_ciudad['mean'] - df_ciudad['std']/10  )[::-1]]),
             fill='toself',
             fillcolor=fillcolor_ciudad, 
@@ -567,14 +618,11 @@ with tab3: # Ciudad
     # Actualizar la fuente del título
     fig_funnel_ciudad.update_layout(title_font=dict(family="Roboto", size=20, color="black"))
     st.plotly_chart(fig_funnel_ciudad)
-
-    with st.expander("Ver explicación"):
-        st.markdown("*Streamlit* is **really** ***cool***.")
     
 with tab4: # Retornabilidad
     explicacion_retornabilidad = '''
         El análisis del efecto de la retornabilidad en la 
-        frescura de nuestros productos es de suma 
+        frescura de los productos es de suma 
         importancia para comprender cómo influye el ciclo de 
         reutilización en la percepción del consumidor y 
         en la calidad del producto. 
@@ -584,7 +632,7 @@ with tab4: # Retornabilidad
         y financiera. Por un lado, la utilización 
         de envases retornables puede reducir la generación de 
         residuos y promover prácticas más ecológicas 
-        dentro de la cadena de suministro. Por otro lado,
+        dentro de la cadena de suministro. Mientras que,
         la sostenibilidad financiera que genera la retornabilidad en una
         empresa de consumo masivo representa ahorro significativo
         al momento de utilizar envases retornables ya que estos representan
@@ -596,7 +644,7 @@ with tab4: # Retornabilidad
         st.markdown(explicacion_retornabilidad)    
     
     fig_line_r = go.Figure()
-    datos_linea_r = filtered_df.groupby(['mes_encuesta', 'Retornable'])['Edad_producto'].agg(['mean', 'std']).reset_index()
+    datos_linea_r = filtered_df.groupby(['mes_nombre', 'Retornable'])['Edad_producto'].agg(['mean', 'std']).reset_index()
 
     for retornable in datos_linea_r['Retornable'].unique():
         df_ret = datos_linea_r[datos_linea_r['Retornable'] == retornable]        
@@ -608,7 +656,7 @@ with tab4: # Retornabilidad
 
         # Línea de la media para cada empaque
         fig_line_r.add_trace(go.Scatter(
-            x=df_ret['mes_encuesta'].astype(str),
+            x=df_ret['mes_nombre'].astype(str),
             y=df_ret['mean'],
             mode='lines+markers',
             name=f'{retornable}',
@@ -617,7 +665,7 @@ with tab4: # Retornabilidad
 
         # Agregar banda de error para la desviación estándar
         fig_line_r.add_trace(go.Scatter(
-            x=pd.concat([df_ret['mes_encuesta'], df_ret['mes_encuesta'][::-1]]).astype(str),
+            x=pd.concat([df_ret['mes_nombre'], df_ret['mes_nombre'][::-1]]).astype(str),
             y=pd.concat([df_ret['mean'] + df_ret['std']/10, (df_ret['mean'] - df_ret['std']/10  )[::-1]]),
             fill='toself',
             fillcolor=fillcolor_r, 
@@ -649,16 +697,13 @@ with tab4: # Retornabilidad
 
     # Actualizar la fuente del título
     fig_funnel_ret.update_layout(title_font=dict(family="Roboto", size=20, color="black"))
-    st.plotly_chart(fig_funnel_ret)    
-
-    with st.expander("Ver explicación"):
-        st.markdown("*Streamlit* is **really** ***cool***.")
+    st.plotly_chart(fig_funnel_ret)
     
 with tab5: # Canal
     explicacion_canal = '''
     El análisis de los tipos de canales de distribución, 
     como el on-trade y el off-trade, es esencial para comprender 
-    cómo varía la frescura y la demanda de nuestros 
+    cómo varía la frescura y la demanda de los 
     productos en diferentes contextos de consumo.
     
     El canal on-trade se enfoca en la frescura inmediata y la 
@@ -667,29 +712,26 @@ with tab5: # Canal
     Por otro lado, en el canal off-trade, la frescura sigue 
     siendo importante, pero también se valoran aspectos como 
     la durabilidad del producto y la presentación del empaque, 
-    ya que los consumidores compran para consumir en casa. 
-    Analizar estos canales nos permite adaptar estrategias 
-    de producción y distribución para mantener la frescura y 
-    satisfacción del cliente en ambos contextos de consumo.
+    ya que los consumidores compran para consumir en casa.
     '''
     
     with st.expander("📕 Ver explicación"):
         st.markdown(explicacion_canal)
         
     fig_line_canal = go.Figure()
-    datos_linea_canal = filtered_df.groupby(['mes_encuesta', 'Canal'])['Edad_producto'].agg(['mean', 'std']).reset_index()
+    datos_linea_canal = filtered_df.groupby(['mes_nombre', 'Canal'])['Edad_producto'].agg(['mean', 'std']).reset_index()
 
     for canal in datos_linea_canal['Canal'].unique():
         df_canal = datos_linea_canal[datos_linea_canal['Canal'] == canal]        
         # Definir colores de fillcolor para la banda de error basados en el empaque
         fillcolor_canal = {
-            'ON': 'rgba(0,97,55, 0.4)',  
-            'OFF': 'rgba(195,192,0, 0.4)'
+            'On': 'rgba(0,97,55, 0.4)',  
+            'Off': 'rgba(195,192,0, 0.4)'
         }.get(canal, 'rgba(0, 0, 0, 0.4)') 
 
         # Línea de la media para cada empaque
         fig_line_canal.add_trace(go.Scatter(
-            x=df_canal['mes_encuesta'].astype(str),
+            x=df_canal['mes_nombre'].astype(str),
             y=df_canal['mean'],
             mode='lines+markers',
             name=f'{canal}',
@@ -698,7 +740,7 @@ with tab5: # Canal
 
         # Agregar banda de error para la desviación estándar
         fig_line_canal.add_trace(go.Scatter(
-            x=pd.concat([df_canal['mes_encuesta'], df_canal['mes_encuesta'][::-1]]).astype(str),
+            x=pd.concat([df_canal['mes_nombre'], df_canal['mes_nombre'][::-1]]).astype(str),
             y=pd.concat([df_canal['mean'] + df_canal['std']/10, (df_canal['mean'] - df_canal['std']/10  )[::-1]]),
             fill='toself',
             fillcolor=fillcolor_canal, 
@@ -731,6 +773,3 @@ with tab5: # Canal
     # Actualizar la fuente del título
     fig_funnel_canal.update_layout(title_font=dict(family="Roboto", size=20, color="black"))
     st.plotly_chart(fig_funnel_canal)
-
-    with st.expander("Ver explicación"):
-        st.markdown("*Streamlit* is **really** ***cool***.")
