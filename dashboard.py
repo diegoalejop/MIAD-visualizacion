@@ -351,8 +351,15 @@ with tab1: # Tendencia general
     de la frescura y su relación con otros aspectos del mercado. 
     '''
     
-    with st.expander("📕 Ver explicación"):
-        st.markdown(explicacion_general)    
+    def stream_fresc_min():
+        for word in explicacion_general.split(" "):
+            yield word + " "
+            time.sleep(0.02)
+    if st.button("Comportamiento global"):
+        st.write_stream(stream_fresc_min)
+
+    #with st.expander("📕 Ver explicación"):
+    #    st.markdown(explicacion_general)    
     
     datos_linea_g = filtered_df.groupby('mes_encuesta')['Edad_producto'].agg(['mean', 'std']).reset_index()
     fig_line_g = go.Figure()
