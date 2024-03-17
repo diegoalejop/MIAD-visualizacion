@@ -4,8 +4,8 @@
 
 Sidebar: 
 	- Cambiar segmentadior de años a selección múltiple - Diego (hecho)
-	- Rnago de datos -Diego 
-	- Agregar creditos -Diego
+	- Rnago de datos -Diego (hecho)
+	- Agregar creditos -Diego (hecho)
 
 Tab1 (Que es la frescura?) 
 	- Presentación e introducción, parrafos explicativos. -Santiago
