@@ -1,27 +1,12 @@
 # Proyecto-visualizacion
  
-¿Qué tan fresco es lo que consumes?
+Desarrollado por Los Cuenteros de la MIAD
+Santiago Pulido, Diego Peñaloza, Miller Patiño
+MIAD - Visualización y Storytelling 202401
 
-Sidebar: 
-	- Cambiar segmentadior de años a selección múltiple - Diego (hecho)
-	- Rnago de datos -Diego (hecho)
-	- Agregar creditos -Diego (hecho)
+A continuación, encontrará la documentación para generación del dashboard ¿Qué tan fresco es lo que consumes? Que presenta a un público general información relevante acerca de la frescura, y por consiguiente de la calidad, de la cerveza en el mercado colombiano y los factores que la afectan. 
 
-Tab1 (Que es la frescura?) 
-	- Presentación e introducción, parrafos explicativos. -Santiago
+La medida de frescura es importante ya que indica cuánto dura un producto en el mercado y por consiguiente sirve por una parte para indicarle al consumidor cuales son los productos más frescos y de mejor calidad en el mercado; mientras que por otra parte sirve de indicador a los productores de cómo se encuentra la saturación del mercado de acuerdo a los productos que produce. Si bien esta segunda parte es muy relevante de cara a las empresas productoras, ya que influencia directamente la decisión de producción, decidimos enfocarnos en comunicar al consumidor promedio de cerveza en Colombia que influye en la calidad de la cerveza que consume. Por ello nuestro objetivo es que el consumidor esté informado de cómo puede obtener el mejor producto según sus preferencias de consumo e informarle sobre el estado del mercado cervecero nacional.
 
-Tab2 (Mirada general): Introducción al global:
 
-	- Tabla Estadisticas descriptivas - cambiarlas por tarjetas - Santiago
-	- Pie de distribución de frescura por categoría - cambiar el color de inacetable. - Miller 
-		- Parrafo explicativo de la agrupación - Santiago
-	- Global de marcas (clasificacion total del año para todas las marcas) - Diego
-	- Tabla de tendencia edad del producto global (boxplots mes a mes) - ya está
-
-Tab3 (Detalle por dimensiones): 
-	- Distribución de frescura por canal - agruaparla por on y off, ordernar de mayor a menor. - Diego
-	- Edad del producto por empaque y mes (boxplot - pasar a lineas con intervalo de confianza) - Miller
-	- Promedio de edad por Ciudad mes a mes (boxplot - pasar a lineas con intervalo de confianza)- Miller
-	- Promedio de edad por retornabilidad (boxplot - pasar a lineas con intervalo de confianza)- Miller
-	- Global por ciudad en mapa - Santiago
-	- Escalafon por establecimientos - ya está
+Derechos Reservados (c)

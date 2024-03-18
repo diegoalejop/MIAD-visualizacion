@@ -134,8 +134,10 @@ df = datos[datos['año_encuesta'] > 2021]
 
 #########
 # Sidebar
-st.sidebar.title('Filtros del reporte')
-st.sidebar.header("Filtra el reporte de acuerdo con tu selección:")
+st.sidebar.title("Filtra el reporte de acuerdo con tu selección:")
+
+#Acceso a documentación
+st.sidebar.link_button("Video Introducción", "https://www.youtube.com/watch?v=tnT4BfDZ0hQ&ab_channel=diegoalejandrope%C3%B1alozamayorga")
 
 ciudad_unico = df['Ciudad'].unique()
 año_unico = df['año_produccion'].unique()
@@ -167,11 +169,11 @@ else:
     if ciudad_select:  # Si se seleccionaron ciudades
         filtered_df = filtered_df[filtered_df['Ciudad'].isin(ciudad_select)]
     
+st.sidebar.link_button("Revisa la Documentación", "https://github.com/diegoalejop/MIAD-visualizacion")
 #Créditos
 st.sidebar.write('Realizado por los cuenteros de la MIAD (c)')
 # Fecha de datos   
-st.sidebar.write('Datos del mercado de Abril 2021 - Diciembre 2023')
-
+st.sidebar.write('Datos de Abril 2021 a Diciembre 2023')
 
 # Contenido
 # --------------------------------------------------------
